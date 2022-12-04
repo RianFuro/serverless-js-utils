@@ -9,7 +9,7 @@
     "./events": "./dist/events.js"
   },
   "scripts": {
-    "build": "tsc",
+    "build": "tsup",
     "test": "jest"
   },
   "keywords": [
