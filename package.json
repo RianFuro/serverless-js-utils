@@ -1,12 +1,18 @@
 {
   "name": "serverless-js-utils",
-  "version": "0.1.3",
+  "version": "0.1.4",
   "description": "Utility functions for a composable serverless framework configuration",
   "types": "dist/index.d.ts",
   "type": "module",
   "exports": {
-    ".": "./dist/index.js",
-    "./events": "./dist/events.js"
+    ".": {
+      "module": "./dist/index.js",
+      "require": "./dist/index.cjs"
+    },
+    "./events": {
+      "module": "./dist/events.js",
+      "require": "./dist/events.cjs"
+    }
   },
   "scripts": {
     "build": "tsup",
