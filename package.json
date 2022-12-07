@@ -6,11 +6,11 @@
   "type": "module",
   "exports": {
     ".": {
-      "module": "./dist/index.js",
+      "import": "./dist/index.js",
       "require": "./dist/index.cjs"
     },
     "./events": {
-      "module": "./dist/events.js",
+      "import": "./dist/events.js",
       "require": "./dist/events.cjs"
     }
   },
