@@ -1,7 +1,7 @@
 import {CfValue} from '../cf-functions.js'
-import {HttpEvent} from './http'
+import {HttpEvent} from './http.js'
 
-export * from './http'
+export * from './http.js'
 
 export type LambdaEvent =
 	| HttpEvent

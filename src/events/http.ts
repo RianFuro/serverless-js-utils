@@ -1,4 +1,4 @@
-import {CfValue} from '../cf-functions'
+import {CfValue} from '../cf-functions.js'
 
 export const httpMethods = ['GET', 'POST', 'PUT', 'DELETE', 'PATCH'] as const
 export type HttpMethod = typeof httpMethods[number]

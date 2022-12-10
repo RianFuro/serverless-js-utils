@@ -1,6 +1,6 @@
-import {LambdaEvent} from './events'
+import {LambdaEvent} from './events/index.js'
 
-export * from './events'
+export * from './events/index.js'
 
 export function lambda(handler: string): LambdaFunction {
 	return Object.setPrototypeOf({handler}, functionHandlerPrototype)

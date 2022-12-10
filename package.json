@@ -35,9 +35,13 @@
   "tsup": {
     "entry": [
       "src/index.ts",
-      "src/events.ts"
+      "src/lambda.ts"
     ],
-    "dts": true,
+    "dts": {
+      "compilerOptions": {
+        "moduleResolution": "NodeNext"
+      }
+    },
     "format": [
       "esm",
       "cjs"
