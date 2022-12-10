@@ -3,7 +3,7 @@ export default {
   preset: 'ts-jest',
   testEnvironment: 'node',
   transform: {
-    '\\.[jt]sx?$': ['ts-jest', {
+    '^.+\\.[jt]s?$': ['ts-jest', {
       useESM: true,
     }],
   },

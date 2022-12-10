@@ -9,9 +9,9 @@
       "import": "./dist/index.js",
       "require": "./dist/index.cjs"
     },
-    "./events": {
-      "import": "./dist/events.js",
-      "require": "./dist/events.cjs"
+    "./lambda": {
+      "import": "./dist/lambda.js",
+      "require": "./dist/lambda.cjs"
     }
   },
   "scripts": {

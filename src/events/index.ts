@@ -1,38 +1,12 @@
-import {CfValue} from './cf-functions.js'
+import {CfValue} from '../cf-functions.js'
+import {HttpEvent} from './http'
 
-export const httpMethods = ['GET', 'POST', 'PUT', 'DELETE', 'PATCH'] as const
-export type HttpMethod = typeof httpMethods[number]
-export type HttpEvent = {
-	http: {
-		method: HttpMethod
-		path: string
-		cors: boolean
-	}
-}
+export * from './http'
 
-type HttpEventBuilder = {
-	(method: HttpMethod, path: string): HttpEvent
-} & {
-	[key in Lowercase<HttpMethod>]: (path: string) => HttpEvent
-}
-export const httpEvent: HttpEventBuilder = Object.assign(
-	function (method: HttpMethod, path: string): HttpEvent {
-		return {
-			http: {
-				method,
-				path,
-				cors: true
-			},
-		}
-	},
-	makeHelperMethods())
-
-function makeHelperMethods(): Record<Lowercase<HttpMethod>, (path: string) => HttpEvent> {
-	return httpMethods.reduce((acc, method) => {
-		acc[method.toLowerCase()] = (path: string) => httpEvent(method, path)
-		return acc;
-	}, {} as Record<Lowercase<HttpMethod>, (path: string) => HttpEvent>)
-}
+export type LambdaEvent =
+	| HttpEvent
+	| DynamoDBEvent
+	| EventBridgeEvent
 
 export type DynamoDBEvent = {
 	stream: {

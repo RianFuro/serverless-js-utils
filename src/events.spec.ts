@@ -1,4 +1,4 @@
-import {dynamodbEvent, eventBridgeEvent, httpEvent, httpMethods} from './events.js'
+import {dynamodbEvent, eventBridgeEvent, httpEvent, httpMethods} from './events'
 import * as fn from './cf-functions.js'
 
 describe('httpEvent', () => {
@@ -28,11 +28,39 @@ describe('httpEvent', () => {
 
 	it('enables cors by default', () => {
 		const event = httpEvent('GET', '/users');
+		expect(event.http.cors).toBe(true)
+	})
 
-		expect(event).toMatchObject({
-			http: {
-				cors: true,
-			}
+	it('allows disabling cors', () => {
+		const event = httpEvent('GET', '/users').configure({cors: false});
+		expect(event.http.cors).toBe(false)
+	})
+
+	it('allows setting the authorizer', () => {
+		const tokenAuthorizedEvent = httpEvent('GET', '/users')
+			.authorizer.token('arn:aws:apigateway:us-east-1:lambda:path/2015-03-31/functions/some-lambda-arn/invocations');
+		expect(tokenAuthorizedEvent.http.authorizer).toEqual({
+			type: 'TOKEN',
+			authorizerId: 'arn:aws:apigateway:us-east-1:lambda:path/2015-03-31/functions/some-lambda-arn/invocations',
+		})
+
+		const iamAuthorizedEvent = httpEvent('GET', '/users').authorizer.iam();
+		expect(iamAuthorizedEvent.http.authorizer).toEqual({
+			type: 'AWS_IAM'
+		})
+
+		const userPoolAuthorizedEvent = httpEvent('GET', '/users')
+			.authorizer.userPool('arn:aws:cognito-idp:us-east-1:123456789012:userpool/us-east-1_123456789');
+		expect(userPoolAuthorizedEvent.http.authorizer).toEqual({
+			type: 'COGNITO_USER_POOLS',
+			authorizerId: 'arn:aws:cognito-idp:us-east-1:123456789012:userpool/us-east-1_123456789',
+		})
+
+		const customAuthorizedEvent = httpEvent('GET', '/users')
+			.authorizer('REQUEST', 'arn:aws:apigateway:us-east-1:lambda:path/2015-03-31/functions/some-lambda-arn/invocations')
+		expect(customAuthorizedEvent.http.authorizer).toEqual({
+			type: 'REQUEST',
+			authorizerId: 'arn:aws:apigateway:us-east-1:lambda:path/2015-03-31/functions/some-lambda-arn/invocations',
 		})
 	})
 })
