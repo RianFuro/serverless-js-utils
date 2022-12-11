@@ -1,6 +1,6 @@
 {
   "name": "serverless-js-utils",
-  "version": "0.2.1",
+  "version": "0.2.2",
   "description": "Utility functions for a composable serverless framework configuration",
   "types": "dist/index.d.ts",
   "type": "module",
