@@ -14,12 +14,20 @@ export type HttpEvent = {
 } & HttpEventBuilder
 
 type HttpEventFactory = {
+	(action: `${HttpMethod} ${string}`): HttpEvent
 	(method: HttpMethod, path: string): HttpEvent
 } & {
 	[key in Lowercase<HttpMethod>]: (path: string) => HttpEvent
 }
 export const httpEvent: HttpEventFactory = Object.assign(
-	function (method: HttpMethod, path: string): HttpEvent {
+	function (methodOrAction: string, path?: string): HttpEvent {
+		let method
+		if (path === undefined) {
+			[method, path] = methodOrAction.split(' ')
+		} else {
+			method = methodOrAction
+		}
+
 		return Object.setPrototypeOf({
 			http: {
 				method,

@@ -13,6 +13,17 @@ describe('httpEvent', () => {
 		})
 	})
 
+	it('allows to define method and path in one string', () => {
+		const event = httpEvent('GET /users');
+
+		expect(event).toMatchObject({
+			http: {
+				method: 'GET',
+				path: '/users',
+			}
+		})
+	})
+
 	it('has a shortcut for all http methods', () => {
 		for (const method of httpMethods) {
 			const event = httpEvent[method.toLowerCase()]('/users');
