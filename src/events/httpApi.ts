@@ -6,9 +6,9 @@ export type HttpApiEvent = {
 		path: string,
 		cors: boolean,
 		authorizer?:
-			| {type: 'AWS_IAM'}
-			| {type: 'REQUEST', functionArn: CfValue}
-			| {type: 'JWT', identitySource: string, issuerUrl: string, audience: string[]}
+			| {type: 'aws_iam'}
+			| {type: 'request', functionArn: CfValue}
+			| {type: 'jwt', identitySource: string, issuerUrl: string, audience: string[]}
 	}
 } & HttpApiEventBuilder
 type AuthorizerType = HttpApiEvent['httpApi']['authorizer']['type']
@@ -50,9 +50,9 @@ const eventPrototype = Object.create(Object, {
 			return Object.assign(
 				setAuthorizer,
 				{
-					iam: () => setAuthorizer('AWS_IAM'),
-					jwt: (identitySource: string, issuerUrl: string, audience: string[]) => setAuthorizer('JWT', {identitySource, issuerUrl, audience}),
-					request: (functionArn: CfValue) => setAuthorizer('REQUEST', {functionArn})
+					iam: () => setAuthorizer('aws_iam'),
+					jwt: (identitySource: string, issuerUrl: string, audience: string[]) => setAuthorizer('jwt', {identitySource, issuerUrl, audience}),
+					request: (functionArn: CfValue) => setAuthorizer('request', {functionArn})
 				})
 		}
 	}

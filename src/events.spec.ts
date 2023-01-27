@@ -35,16 +35,16 @@ describe('httpApiEvent', () => {
 	it('allows setting the authorizer', () => {
 		const iamAuthorizedEvent = httpApiEvent('GET', '/users')
 			.authorizer.iam()
-		expect(iamAuthorizedEvent.httpApi.authorizer).toMatchObject({type: 'AWS_IAM'})
+		expect(iamAuthorizedEvent.httpApi.authorizer).toMatchObject({type: 'aws_iam'})
 
 		const requestAuthorizedEvent = httpApiEvent('GET', '/users')
 			.authorizer.request(fn.ref('MyAuthorizer'))
-		expect(requestAuthorizedEvent.httpApi.authorizer).toMatchObject({type: 'REQUEST', functionArn: fn.ref('MyAuthorizer')})
+		expect(requestAuthorizedEvent.httpApi.authorizer).toMatchObject({type: 'request', functionArn: fn.ref('MyAuthorizer')})
 
 		const jwtAuthorizedEvent = httpApiEvent('GET', '/users')
 			.authorizer.jwt('$request.header.Authorization', 'https://cognito-idp.eu-central-1.amazonaws.com/asdfQWER1234', ['https://my-client.app'])
 		expect(jwtAuthorizedEvent.httpApi.authorizer).toMatchObject({
-			type: 'JWT',
+			type: 'jwt',
 			identitySource: '$request.header.Authorization',
 			issuerUrl: 'https://cognito-idp.eu-central-1.amazonaws.com/asdfQWER1234',
 			audience: ['https://my-client.app'],
