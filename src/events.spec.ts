@@ -1,5 +1,56 @@
-import {dynamodbEvent, eventBridgeEvent, httpEvent, httpMethods} from './events'
+import {dynamodbEvent, eventBridgeEvent, httpEvent, httpApiEvent, httpMethods} from './events'
 import * as fn from './cf-functions.js'
+
+describe('httpApiEvent', () => {
+	it('should return an httpApi event definition', () => {
+		const event = httpApiEvent('GET', '/users')
+		expect(event).toMatchObject({
+			httpApi: {
+				method: 'GET',
+				path: '/users',
+			}
+		})
+	})
+
+	it('allows to define method and pathin one string', () => {
+		const event = httpApiEvent('GET /users')
+		expect(event).toMatchObject({
+			httpApi: {
+				method: 'GET',
+				path: '/users',
+			}
+		})
+	})
+
+	it('enables cors by default', () => {
+		const event = httpApiEvent('GET /users')
+		expect(event.httpApi.cors).toBe(true)
+	})
+
+	it('allows disabling cors', () => {
+		const event = httpApiEvent('GET', '/users').configure({cors: false});
+		expect(event.httpApi.cors).toBe(false)
+	})
+
+	it('allows setting the authorizer', () => {
+		const iamAuthorizedEvent = httpApiEvent('GET', '/users')
+			.authorizer.iam()
+		expect(iamAuthorizedEvent.httpApi.authorizer).toMatchObject({type: 'AWS_IAM'})
+
+		const requestAuthorizedEvent = httpApiEvent('GET', '/users')
+			.authorizer.request(fn.ref('MyAuthorizer'))
+		expect(requestAuthorizedEvent.httpApi.authorizer).toMatchObject({type: 'REQUEST', functionArn: fn.ref('MyAuthorizer')})
+
+		const jwtAuthorizedEvent = httpApiEvent('GET', '/users')
+			.authorizer.jwt('$request.header.Authorization', 'https://cognito-idp.eu-central-1.amazonaws.com/asdfQWER1234', ['https://my-client.app'])
+		expect(jwtAuthorizedEvent.httpApi.authorizer).toMatchObject({
+			type: 'JWT',
+			identitySource: '$request.header.Authorization',
+			issuerUrl: 'https://cognito-idp.eu-central-1.amazonaws.com/asdfQWER1234',
+			audience: ['https://my-client.app'],
+		})
+	})
+})
 
 describe('httpEvent', () => {
 	it('should return an http event definition', () => {
