@@ -1,11 +1,13 @@
 import {CfValue} from '../cf-functions.js'
 import {HttpEvent} from './http.js'
+import {HttpApiEvent} from './httpApi.js'
 
 export * from './http.js'
 export * from './httpApi.js'
 
 export type LambdaEvent =
 	| HttpEvent
+	| HttpApiEvent
 	| DynamoDBEvent
 	| EventBridgeEvent
 
