@@ -35,7 +35,8 @@
   "tsup": {
     "entry": [
       "src/index.ts",
-      "src/lambda.ts"
+      "src/lambda.ts",
+      "src/cloud-formation/index.ts"
     ],
     "dts": {
       "compilerOptions": {
