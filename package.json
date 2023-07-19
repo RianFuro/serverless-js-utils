@@ -12,6 +12,10 @@
     "./lambda": {
       "import": "./dist/lambda.js",
       "require": "./dist/lambda.cjs"
+    },
+    "./aws": {
+      "import": "./dist/cloud-formation/index.js",
+      "require": "./dist/cloud-formation/index.cjs"
     }
   },
   "scripts": {
