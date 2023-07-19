@@ -40,12 +40,31 @@ export type Resources = {
 		StreamSpecification: {
 			StreamViewType: string // TODO: enumerate
 		}
-	}
+	},
+
+	'AWS::SQS::Queue': {
+		ContentBasedDeduplication?: boolean,
+		DeduplicationScope?: string,
+		DelaySeconds?: number,
+		FifoQueue?: boolean,
+		FifoThroughputLimit?: string,
+		KmsDataKeyReusePeriodSeconds?: number,
+		KmsMasterKeyId?: string,
+		MaximumMessageSize?: number,
+		MessageRetentionPeriod?: number,
+		QueueName?: string,
+		ReceiveMessageWaitTimeSeconds?: number,
+		RedriveAllowPolicy?: any,
+		RedrivePolicy?: any,
+		SqsManagedSseEnabled?: boolean,
+		Tags?: any[],
+		VisibilityTimeout?: number
+	},
 
 	[key: string]: Record<string, any>
 }
 
-export function resource<TKey extends string>(type: TKey, properties?: Resources[TKey]): Resource<TKey> {
+export function resource<TKey extends string>(type: TKey, properties: Resources[TKey]): Resource<TKey> {
 	return {
 		Type: type,
 		Properties: properties,
@@ -61,5 +80,11 @@ export const apiGateway = {
 export const dynamoDb = {
 	table(properties: Resources['AWS::DynamoDB::Table']): Resource<'AWS::DynamoDB::Table'> {
 		return resource('AWS::DynamoDB::Table', properties)
+	}
+}
+
+export const sqs = {
+	queue(properties: Resources['AWS::SQS::Queue']): Resource<'AWS::SQS::Queue'> {
+		return resource('AWS::SQS::Queue', properties)
 	}
 }
