@@ -2,7 +2,7 @@ import {resource} from './index.js'
 
 describe('resource', () => {
 	it('should return a resource definition', () => {
-		const res = resource('AWS::S3::Bucket');
+		const res = resource('AWS::S3::Bucket', {});
 
 		expect(res).toMatchObject({
 			Type: 'AWS::S3::Bucket',
