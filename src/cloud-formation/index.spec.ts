@@ -49,7 +49,7 @@ describe('resource', () => {
 				Type: 'AWS::DynamoDB::Table',
 				Properties: {
 					TableName: 'test',
-					AttributeDefinition: [
+					AttributeDefinitions: [
 						{AttributeName: 'PK', AttributeType: 'S'},
 						{AttributeName: 'SK', AttributeType: 'S'},
 						{AttributeName: 'GSI1-PK', AttributeType: 'S'},
@@ -84,7 +84,7 @@ describe('resource', () => {
 				Type: 'AWS::DynamoDB::Table',
 				Properties: {
 					TableName: 'test',
-					AttributeDefinition: [
+					AttributeDefinitions: [
 						{AttributeName: 'PK', AttributeType: 'S'},
 						{AttributeName: 'SK', AttributeType: 'S'},
 						{AttributeName: 'GSI1-PK', AttributeType: 'S'},
@@ -115,7 +115,7 @@ describe('resource', () => {
 			expect(res).toMatchObject({
 				Type: 'AWS::DynamoDB::Table',
 				Properties: {
-					AttributeDefinition: [
+					AttributeDefinitions: [
 						{AttributeName: 'PK', AttributeType: 'S'},
 						{AttributeName: 'SK', AttributeType: 'S'},
 						{AttributeName: 'GSI1-PK', AttributeType: 'S'},

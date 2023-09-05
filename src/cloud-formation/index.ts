@@ -18,7 +18,7 @@ export type Resources = {
 
 	'AWS::DynamoDB::Table': {
 		TableName?: string
-		AttributeDefinition: {
+		AttributeDefinitions: {
 			AttributeName: string
 			AttributeType: string // TODO: enumerate
 		}[]
@@ -91,8 +91,8 @@ class DynamoDbTableProxyHandle {
 		this.Type = 'AWS::DynamoDB::Table'
 		this.Properties = initialProperties
 
-		if (!this.Properties.AttributeDefinition) {
-			this.Properties.AttributeDefinition = []
+		if (!this.Properties.AttributeDefinitions) {
+			this.Properties.AttributeDefinitions = []
 		}
 	}
 }
@@ -122,7 +122,7 @@ Object.defineProperties(DynamoDbTableProxyHandle.prototype, {
 			if (typeof pk === 'string') pk = [pk, 'string']
 			if (typeof sk === 'string') sk = [sk, 'string']
 
-			this.Properties.AttributeDefinition.push(
+			this.Properties.AttributeDefinitions.push(
 				{AttributeName: pk[0], AttributeType: attributeTypeMap[pk[1]]},
 			)
 			this.Properties.KeySchema = [
@@ -130,7 +130,7 @@ Object.defineProperties(DynamoDbTableProxyHandle.prototype, {
 			]
 
 			if (sk) {
-				this.Properties.AttributeDefinition.push(
+				this.Properties.AttributeDefinitions.push(
 					{AttributeName: sk[0], AttributeType: attributeTypeMap[sk[1]]},
 				)
 				this.Properties.KeySchema.push(
@@ -161,7 +161,7 @@ Object.defineProperties(DynamoDbTableProxyHandle.prototype, {
 				}
 			}
 
-			this.Properties.AttributeDefinition.push(
+			this.Properties.AttributeDefinitions.push(
 				{AttributeName: pk[0], AttributeType: attributeTypeMap[pk[1]]},
 			)
 
@@ -169,7 +169,7 @@ Object.defineProperties(DynamoDbTableProxyHandle.prototype, {
 				gsi.KeySchema.push(
 					{AttributeName: sk[0], KeyType: 'RANGE'},
 				)
-				this.Properties.AttributeDefinition.push(
+				this.Properties.AttributeDefinitions.push(
 					{AttributeName: sk[0], AttributeType: attributeTypeMap[sk[1]]},
 				)
 			}
