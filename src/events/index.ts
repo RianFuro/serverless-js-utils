@@ -10,6 +10,9 @@ export type LambdaEvent =
 	| HttpApiEvent
 	| DynamoDBEvent
 	| EventBridgeEvent
+	| IoTEvent
+	| SQSEvent
+
 
 export type DynamoDBEvent = {
 	stream: {
@@ -67,3 +70,30 @@ export const eventBridgeEvent: EventBridgeEventBuilder = {
 		return builder as EventBridgeEventBuilder
 	}
 }
+
+export type IoTEvent = {
+	iot: {
+		sql: string
+	}
+}
+export type IoTEventBuidler = (sql: string) => IoTEvent
+
+export const iotEvent: IoTEventBuidler = (sql: string) => ({
+	iot: {
+		sql,
+	}
+})
+
+
+export type SQSEvent = {
+	sqs: {
+		arn: CfValue
+	}
+}
+export type SQSEventBuilder = (queueArn: CfValue) => SQSEvent
+
+export const sqsEvent: SQSEventBuilder = (queueArn: CfValue) => ({
+	sqs: {
+		arn: queueArn,
+	}
+})
