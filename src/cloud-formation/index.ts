@@ -36,9 +36,9 @@ export type Resources = {
 				KeyType: string // TODO: enumerate
 			}[]
 		}[]
-		BillingMode?: string // TODO: enumerate
+		BillingMode?: 'PROVISIONED' | 'PAY_PER_REQUEST'
 		StreamSpecification: {
-			StreamViewType: string // TODO: enumerate
+			StreamViewType: 'KEYS_ONLY' | 'NEW_IMAGE' | 'OLD_IMAGE' | 'NEW_AND_OLD_IMAGES'
 		}
 	},
 
@@ -78,9 +78,142 @@ export const apiGateway = {
 }
 
 export const dynamoDb = {
-	table(properties: Resources['AWS::DynamoDB::Table']): Resource<'AWS::DynamoDB::Table'> {
-		return resource('AWS::DynamoDB::Table', properties)
+	table: function table(properties: Partial<Resources['AWS::DynamoDB::Table']> = {}): DynamoDbTableProxyHandle {
+		return new DynamoDbTableProxyHandle(properties)
+	},
+}
+
+class DynamoDbTableProxyHandle {
+	readonly Type: 'AWS::DynamoDB::Table'
+	readonly Properties: Partial<Resources['AWS::DynamoDB::Table']>
+
+	constructor(initialProperties: Partial<Resources['AWS::DynamoDB::Table']> = {}) {
+		this.Type = 'AWS::DynamoDB::Table'
+		this.Properties = initialProperties
+
+		if (!this.Properties.AttributeDefinition) {
+			this.Properties.AttributeDefinition = []
+		}
 	}
+}
+interface DynamoDbTableProxyHandle {
+	name(tableName: string): DynamoDbTableProxyHandle
+	key(pk: KeyDefinition, sk?: KeyDefinition): DynamoDbTableProxyHandle
+	gsi(indexName: string, keySchema: {pk: KeyDefinition, sk?: KeyDefinition}, projectionType?: ProjectionType): DynamoDbTableProxyHandle
+	stream(viewType?: Resources['AWS::DynamoDB::Table']['StreamSpecification']['StreamViewType']): DynamoDbTableProxyHandle
+	payPerRequest(): DynamoDbTableProxyHandle
+	withDefaults(...defaultPatterns: DefaultPattern[]): DynamoDbTableProxyHandle
+}
+export type BillingMode = Resources['AWS::DynamoDB::Table']['BillingMode']
+export type ProjectionType = Resources['AWS::DynamoDB::Table']['GlobalSecondaryIndexes'][number]['Projection']['ProjectionType']
+export type KeyDefinition = [string, 'string' | 'number'] | string
+type GsiNumbers = 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10 | 11 | 12 | 13 | 14 | 15 | 16 | 17 | 18 | 19 | 20
+export type DefaultPattern = 'key' | `gsi${GsiNumbers}` | 'billing' | 'stream'
+
+Object.defineProperties(DynamoDbTableProxyHandle.prototype, {
+	name: {
+		value(tableName: string) {
+			this.Properties.TableName = tableName
+			return this
+		}
+	},
+	key: {
+		value(pk: KeyDefinition, sk?: KeyDefinition) {
+			if (typeof pk === 'string') pk = [pk, 'string']
+			if (typeof sk === 'string') sk = [sk, 'string']
+
+			this.Properties.AttributeDefinition.push(
+				{AttributeName: pk[0], AttributeType: attributeTypeMap[pk[1]]},
+			)
+			this.Properties.KeySchema = [
+				{AttributeName: pk[0], KeyType: 'HASH'},
+			]
+
+			if (sk) {
+				this.Properties.AttributeDefinition.push(
+					{AttributeName: sk[0], AttributeType: attributeTypeMap[sk[1]]},
+				)
+				this.Properties.KeySchema.push(
+					{AttributeName: sk[0], KeyType: 'RANGE'},
+				)
+			}
+
+			return this
+		}
+	},
+	gsi: {
+		value(indexName: string, keySchema: {pk: KeyDefinition, sk?: KeyDefinition}, projectionType: ProjectionType = 'ALL') {
+			if (!this.Properties.GlobalSecondaryIndexes) {
+				this.Properties.GlobalSecondaryIndexes = []
+			}
+
+			let {pk, sk} = keySchema
+			if (typeof pk === 'string') pk = [pk, 'string']
+			if (typeof sk === 'string') sk = [sk, 'string']
+
+			const gsi = {
+				IndexName: indexName,
+				KeySchema: [
+					{AttributeName: pk[0], KeyType: 'HASH'},
+				],
+				Projection: {
+					ProjectionType: projectionType
+				}
+			}
+
+			this.Properties.AttributeDefinition.push(
+				{AttributeName: pk[0], AttributeType: attributeTypeMap[pk[1]]},
+			)
+
+			if (sk) {
+				gsi.KeySchema.push(
+					{AttributeName: sk[0], KeyType: 'RANGE'},
+				)
+				this.Properties.AttributeDefinition.push(
+					{AttributeName: sk[0], AttributeType: attributeTypeMap[sk[1]]},
+				)
+			}
+
+			this.Properties.GlobalSecondaryIndexes.push(gsi)
+			return this
+		}
+	},
+	stream: {
+		value(viewType: Resources['AWS::DynamoDB::Table']['StreamSpecification']['StreamViewType'] = 'NEW_AND_OLD_IMAGES') {
+			this.Properties.StreamSpecification = {
+				StreamViewType: viewType
+			}
+
+			return this
+		}
+	},
+	payPerRequest: {
+		value() {
+			this.Properties.BillingMode = 'PAY_PER_REQUEST'
+			return this
+		}
+	},
+	withDefaults: {
+		value(...defaultPatterns: DefaultPattern[]) {
+			for (const pattern of defaultPatterns) {
+				if (pattern === 'key') this.key('PK', 'SK')
+				if (pattern === 'stream') this.stream()
+				if (pattern === 'billing') this.payPerRequest()
+				if (pattern.startsWith('gsi')) {
+					const indexNumber = Number(pattern.slice(3))
+					const indexName = `GSI${indexNumber}`
+					this.gsi(indexName, {pk: `${indexName}-PK`, sk: `${indexName}-SK`})
+				}
+			}
+
+			return this
+		}
+	}
+})
+
+const attributeTypeMap: Record<'string' | 'number', string> = {
+	string: 'S',
+	number: 'N'
 }
 
 export const sqs = {
