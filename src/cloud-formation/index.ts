@@ -1,3 +1,5 @@
+import { CfValue } from "../cf-functions.js";
+
 export type Resource<TKey extends string, TProperties = Resources[TKey]> = {
 	Type: TKey
 	Properties: TProperties
@@ -112,7 +114,7 @@ export type DefaultPattern = 'key' | `gsi${GsiNumbers}` | 'billing' | 'stream'
 
 Object.defineProperties(DynamoDbTableProxyHandle.prototype, {
 	name: {
-		value(tableName: string) {
+		value(tableName: CfValue) {
 			this.Properties.TableName = tableName
 			return this
 		}
