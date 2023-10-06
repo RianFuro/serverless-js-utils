@@ -170,9 +170,11 @@ Object.defineProperties(DynamoDbTableProxyHandle.prototype, {
 				gsi.KeySchema.push(
 					{AttributeName: sk[0], KeyType: 'RANGE'},
 				)
-				this.Properties.AttributeDefinitions.push(
-					{AttributeName: sk[0], AttributeType: attributeTypeMap[sk[1]]},
-				)
+
+				if (!this.Properties.AttributeDefinitions.find(attr => attr.AttributeName === sk[0]))
+					this.Properties.AttributeDefinitions.push(
+						{AttributeName: sk[0], AttributeType: attributeTypeMap[sk[1]]},
+					)
 			}
 
 			this.Properties.GlobalSecondaryIndexes.push(gsi)
