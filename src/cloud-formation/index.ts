@@ -161,9 +161,10 @@ Object.defineProperties(DynamoDbTableProxyHandle.prototype, {
 				}
 			}
 
-			this.Properties.AttributeDefinitions.push(
-				{AttributeName: pk[0], AttributeType: attributeTypeMap[pk[1]]},
-			)
+			if (!this.Properties.AttributeDefinitions.find(attr => attr.AttributeName === pk[0]))
+				this.Properties.AttributeDefinitions.push(
+					{AttributeName: pk[0], AttributeType: attributeTypeMap[pk[1]]},
+				)
 
 			if (sk) {
 				gsi.KeySchema.push(
