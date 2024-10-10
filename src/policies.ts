@@ -1,4 +1,4 @@
-import {CfValue} from './cf-functions'
+import {CfValue} from './cf-functions.js'
 
 export type PolicyStatement = {
 	Effect: 'Allow' | 'Deny'

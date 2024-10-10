@@ -76,11 +76,12 @@ export type IoTEvent = {
 		sql: string
 	}
 }
-export type IoTEventBuidler = (sql: string) => IoTEvent
+export type IoTEventBuidler = (sql: string, version?: string) => IoTEvent
 
-export const iotEvent: IoTEventBuidler = (sql: string) => ({
+export const iotEvent: IoTEventBuidler = (sql: string, version?: string) => ({
 	iot: {
 		sql,
+		sqlVersion: version ?? 'beta',
 	}
 })
 
