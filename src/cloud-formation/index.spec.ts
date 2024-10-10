@@ -110,7 +110,7 @@ describe('resource', () => {
 		it('can set default patterns', () => {
 			const res =
 				dynamoDb.table()
-					.withDefaults('key', 'gsi1', 'stream', 'billing')
+					.withDefaults('key', 'gsi1', 'stream', 'billing', 'ttl')
 
 			expect(res).toMatchObject({
 				Type: 'AWS::DynamoDB::Table',
@@ -135,6 +135,10 @@ describe('resource', () => {
 						}
 					],
 					BillingMode: 'PAY_PER_REQUEST',
+					TimeToLiveSpecification: {
+						AttributeName: 'ttl',
+						Enabled: true,
+					},
 					StreamSpecification: {
 						StreamViewType: 'NEW_AND_OLD_IMAGES'
 					}

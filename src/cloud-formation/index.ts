@@ -39,6 +39,10 @@ export type Resources = {
 			}[]
 		}[]
 		BillingMode?: 'PROVISIONED' | 'PAY_PER_REQUEST'
+		TimeToLiveSpecification: {
+			AttributeName: string
+			Enabled: boolean
+		}
 		StreamSpecification: {
 			StreamViewType: 'KEYS_ONLY' | 'NEW_IMAGE' | 'OLD_IMAGE' | 'NEW_AND_OLD_IMAGES'
 		}
@@ -104,13 +108,14 @@ interface DynamoDbTableProxyHandle {
 	gsi(indexName: string, keySchema: {pk: KeyDefinition, sk?: KeyDefinition}, projectionType?: ProjectionType): DynamoDbTableProxyHandle
 	stream(viewType?: Resources['AWS::DynamoDB::Table']['StreamSpecification']['StreamViewType']): DynamoDbTableProxyHandle
 	payPerRequest(): DynamoDbTableProxyHandle
+	ttl(field?: string): DynamoDbTableProxyHandle
 	withDefaults(...defaultPatterns: DefaultPattern[]): DynamoDbTableProxyHandle
 }
 export type BillingMode = Resources['AWS::DynamoDB::Table']['BillingMode']
 export type ProjectionType = Resources['AWS::DynamoDB::Table']['GlobalSecondaryIndexes'][number]['Projection']['ProjectionType']
 export type KeyDefinition = [string, 'string' | 'number'] | string
 type GsiNumbers = 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10 | 11 | 12 | 13 | 14 | 15 | 16 | 17 | 18 | 19 | 20
-export type DefaultPattern = 'key' | `gsi${GsiNumbers}` | 'billing' | 'stream'
+export type DefaultPattern = 'key' | `gsi${GsiNumbers}` | 'billing' | 'stream' | 'ttl'
 
 Object.defineProperties(DynamoDbTableProxyHandle.prototype, {
 	name: {
@@ -198,12 +203,22 @@ Object.defineProperties(DynamoDbTableProxyHandle.prototype, {
 			return this
 		}
 	},
+	ttl: {
+		value(field: string = 'ttl') {
+			this.Properties.TimeToLiveSpecification = {
+				AttributeName: field,
+				Enabled: true,
+			}
+			return this
+		}
+	},
 	withDefaults: {
-		value(...defaultPatterns: DefaultPattern[]) {
+		value(this: DynamoDbTableProxyHandle, ...defaultPatterns: DefaultPattern[]) {
 			for (const pattern of defaultPatterns) {
 				if (pattern === 'key') this.key('PK', 'SK')
 				if (pattern === 'stream') this.stream()
 				if (pattern === 'billing') this.payPerRequest()
+				if (pattern === 'ttl') this.ttl()
 				if (pattern.startsWith('gsi')) {
 					const indexNumber = Number(pattern.slice(3))
 					const indexName = `GSI${indexNumber}`
